@@ -312,6 +312,12 @@ local function initialize()
     createUICorner(floatingButton, 10)
     neonify(floatingButton)
     addDebugLog("Botão flutuante criado com sucesso", "Notificações")-- Criar frame principal (HUD)
+    
+    floatingButton.MouseButton1Click:Connect(function()
+        Main.Visible = not Main.Visible
+        floatingButton.Visible = not Main.Visible
+        addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via botão flutuante", "Notificações")
+    end)
     local Main = Instance.new("Frame")
     Main.Size = UDim2.new(0, 500, 0, 350) -- Aumentado para caber mais abas
     Main.Position = UDim2.new(0.5, -250, 0.5, -175)
