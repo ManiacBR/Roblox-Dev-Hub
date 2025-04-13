@@ -1,4 +1,4 @@
--- DevHub: Script Ajustado (HUD Mais Profissional com Novas Funcionalidades)
+-- DevHub: Script Ajustado (HUD Modernizado)
 
 -- Evitar múltiplas execuções
 if getgenv().DevHubLoaded then 
@@ -19,27 +19,22 @@ local MAX_LOG_LINES = 100 -- Limite de linhas na janela de logs
 local function addDebugLog(message)
     local currentTime = tick()
     
-    -- Verificar se a mensagem já foi logada recentemente (cooldown de 1 segundo)
     if lastLogTimes[message] and (currentTime - lastLogTimes[message] < 1) then
-        return -- Não logar se estiver dentro do cooldown
+        return
     end
     
     lastLogTimes[message] = currentTime
     
-    -- Adicionar o log à tabela
     table.insert(debugLog, message)
     
-    -- Limitar o número de linhas
     if #debugLog > MAX_LOG_LINES then
-        table.remove(debugLog, 1) -- Remove a linha mais antiga
+        table.remove(debugLog, 1)
     end
     
-    -- Atualizar apenas a UI se necessário
     if logText then
         logText.Text = "Logs:\n" .. table.concat(debugLog, "\n")
     end
     
-    -- Exibir no console para depuração
     print("[DevHub Log]: " .. message)
 end
 
@@ -112,6 +107,7 @@ local function createLogWindow()
     copyBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     copyBtn.BackgroundTransparency = 0.1
     copyBtn.TextSize = 14
+    copy- Tela cheia
     copyBtn.ZIndex = 10002
     copyBtn.Font = Enum.Font.Gotham
     copyBtn.Parent = logFrame
@@ -192,7 +188,6 @@ local function showNotification(message, notificationType)
     stroke.Transparency = 0.5
     stroke.Parent = notifFrame
 
-    -- Definir cor com base no tipo
     if notificationType == "error" then
         stroke.Color = Color3.fromRGB(255, 100, 100)
     elseif notificationType == "success" then
@@ -227,7 +222,6 @@ end
 
 -- Inicialização
 local success, err = pcall(function()
-    -- Carregar serviços
     local Players = game:GetService("Players")
     local UserInputService = game:GetService("UserInputService")
     local RunService = game:GetService("RunService")
@@ -241,7 +235,6 @@ local success, err = pcall(function()
     end
     addDebugLog("LocalPlayer carregado - " .. (LocalPlayer and LocalPlayer.Name or "N/A"))
 
-    -- Criar ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "DevHubUI"
     ScreenGui.ResetOnSpawn = false
@@ -272,22 +265,20 @@ local success, err = pcall(function()
     end
     addDebugLog("ScreenGui criada com sucesso")
 
-    -- Configurações iniciais
     local flySpeed = 50
     local flying = false
     local flyConnection
     local bodyVelocity
     local noclip = false
     local verticalFly = 0
+    local selectedPlayer = nil
 
-    -- Função pra criar UICorner
     local function createUICorner(obj, rad)
         local uic = Instance.new("UICorner")
         uic.CornerRadius = UDim.new(0, rad)
         uic.Parent = obj
     end
 
-    -- Função pra aplicar estilo neon
     local function neonify(obj)
         obj.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
         obj.BackgroundTransparency = 0.1
@@ -299,7 +290,6 @@ local success, err = pcall(function()
         stroke.Parent = obj
     end
 
-    -- Criar botão flutuante
     local floatingButton = Instance.new("TextButton")
     floatingButton.Size = UDim2.new(0, 50, 0, 50)
     floatingButton.Position = UDim2.new(0, 20, 0.5, -25)
@@ -313,16 +303,15 @@ local success, err = pcall(function()
     neonify(floatingButton)
     addDebugLog("Botão flutuante criado com sucesso")
 
-    -- Criar frame principal (HUD)
     local Main = Instance.new("Frame")
-    Main.Size = UDim2.new(0, 500, 0, 300)
-    Main.Position = UDim2.new(0.5, -250, 0.5, -150)
-    Main.BackgroundTransparency = 0.1
+    Main.Size = UDim2.new(0, 600, 0, 350)
+    Main.Position = UDim2.new(0.5, -300, 0.5, -175)
+    Main.BackgroundTransparency = 1
     Main.ZIndex = 10000
+    Main.Visible = false
     Main.Parent = ScreenGui
     createUICorner(Main, 20)
 
-    -- Adicionar gradiente
     local gradient = Instance.new("UIGradient")
     gradient.Color = ColorSequence.new({
         ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
@@ -333,7 +322,6 @@ local success, err = pcall(function()
     neonify(Main)
     addDebugLog("Frame principal criado com gradiente")
 
-    -- Criar área de arrastar (topo da HUD)
     local dragBar = Instance.new("Frame")
     dragBar.Size = UDim2.new(1, 0, 0, 40)
     dragBar.Position = UDim2.new(0, 0, 0, 0)
@@ -341,15 +329,14 @@ local success, err = pcall(function()
     dragBar.ZIndex = 10002
     dragBar.Parent = Main
 
-    -- Função pra criar botões com hover
     local function createButton(text, parent, position, size, isTab)
         local btn = Instance.new("TextButton")
-        btn.Size = size or UDim2.new(0, 120, 0, 30)
+        btn.Size = size or UDim2.new(0, 100, 0, 25)
         btn.Position = position
         btn.TextColor3 = Color3.fromRGB(255, 255, 255)
         btn.Text = text
         btn.ZIndex = 10001
-        btn.TextSize = 14
+        btn.TextSize = 12
         btn.Font = Enum.Font.Gotham
         btn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
         btn.BackgroundTransparency = isTab and 0.3 or 0.1
@@ -383,47 +370,46 @@ local success, err = pcall(function()
         return btn
     end
 
-    -- Função pra criar toggles
     local function createToggle(text, parent, position, toggle)
         local toggleFrame = Instance.new("Frame")
-        toggleFrame.Size = UDim2.new(0, 150, 0, 24)
+        toggleFrame.Size = UDim2.new(0, 130, 0, 20)
         toggleFrame.Position = position
         toggleFrame.BackgroundTransparency = 1
         toggleFrame.ZIndex = 10001
         toggleFrame.Parent = parent
 
         local label = Instance.new("TextLabel")
-        label.Size = UDim2.new(0, 90, 1, 0)
+        label.Size = UDim2.new(0, 80, 1, 0)
         label.Position = UDim2.new(0, 0, 0, 0)
         label.BackgroundTransparency = 1
         label.TextColor3 = Color3.fromRGB(255, 255, 255)
         label.Text = text
-        label.TextSize = 12
+        label.TextSize = 10
         label.TextXAlignment = Enum.TextXAlignment.Left
         label.Font = Enum.Font.Gotham
         label.ZIndex = 10002
         label.Parent = toggleFrame
 
         local toggleBtn = Instance.new("TextButton")
-        toggleBtn.Size = UDim2.new(0, 40, 0, 20)
-        toggleBtn.Position = UDim2.new(1, -40, 0.5, -10)
+        toggleBtn.Size = UDim2.new(0, 36, 0, 16)
+        toggleBtn.Position = UDim2.new(1, -36, 0.5, -8)
         toggleBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
         toggleBtn.BackgroundTransparency = 0.1
         toggleBtn.Text = ""
         toggleBtn.ZIndex = 10002
         toggleBtn.Parent = toggleFrame
-        createUICorner(toggleBtn, 10)
+        createUICorner(toggleBtn, 8)
 
         local toggleKnob = Instance.new("Frame")
-        toggleKnob.Size = UDim2.new(0, 16, 0, 16)
-        toggleKnob.Position = UDim2.new(0, 4, 0.5, -8)
+        toggleKnob.Size = UDim2.new(0, 12, 0, 12)
+        toggleKnob.Position = UDim2.new(0, 4, 0.5, -6)
         toggleKnob.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
         toggleKnob.ZIndex = 10003
         toggleKnob.Parent = toggleBtn
-        createUICorner(toggleKnob, 8)
+        createUICorner(toggleKnob, 6)
 
         local function updateToggle(state)
-            local knobPos = state and UDim2.new(1, -20, 0.5, -8) or UDim2.new(0, 4, 0.5, -8)
+            local knobPos = state and UDim2.new(1, -16, 0.5, -6) or UDim2.new(0, 4, 0.5, -6)
             local knobColor = state and Color3.fromRGB(0, 255, 128) or Color3.fromRGB(100, 100, 100)
             TweenService:Create(toggleKnob, TweenInfo.new(0.2), {Position = knobPos, BackgroundColor3 = knobColor}):Play()
         end
@@ -440,20 +426,29 @@ local success, err = pcall(function()
         return toggleFrame
     end
 
-    -- Criar frame de abas
     local tabButtonsFrame = Instance.new("Frame")
-    tabButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
+    tabButtonsFrame.Size = UDim2.new(0, 120, 1, -40)
+    tabButtonsFrame.Position = UDim2.new(0, 10, 0, 40)
     tabButtonsFrame.BackgroundTransparency = 1
-    tabButtonsFrame.Position = UDim2.new(0, 0, 0, 0)
+    tabButtonsFrame.ZIndex = 10000
     tabButtonsFrame.Parent = Main
 
-    local movementTabButton = createButton("Movement", tabButtonsFrame, UDim2.new(0, 10, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 115, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local playersTabButton = createButton("Players", tabButtonsFrame, UDim2.new(0, 220, 0, 5), UDim2.new(0, 100, 0, 30), true)
+    local miscTabButton = createButton("Misc", tabButtonsFrame, UDim2.new(0, 0, 0, 10), UDim2.new(1, -10, 0, 30), true)
+    local logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 0, 0, 50), UDim2.new(1, -10, 0, 30), true)
 
-    local closeBtn = createButton("X", tabButtonsFrame, UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30))
+    local closeBtn = createButton("X", Main, UDim2.new(1, -30, 0, 5), UDim2.new(0, 25, 0, 25))
     closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
     closeBtn.MouseButton1Click:Connect(function()
+        local tweens = {}
+        for _, child in pairs(Main:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                table.insert(tweens, TweenService:Create(child, TweenInfo.new(0.3), {BackgroundTransparency = 1, TextTransparency = 1}))
+            end
+        end
+        for _, tween in ipairs(tweens) do
+            tween:Play()
+        end
+        TweenService:Create(Main, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play():Wait()
         ScreenGui:Destroy()
         if flyConnection then flyConnection:Disconnect() end
         if bodyVelocity then bodyVelocity:Destroy() end
@@ -462,69 +457,67 @@ local success, err = pcall(function()
         getgenv().DevHubLoaded = nil
     end)
 
-    local minimizeBtn = createButton("−", tabButtonsFrame, UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30))
+    local minimizeBtn = createButton("−", Main, UDim2.new(1, -60, 0, 5), UDim2.new(0, 25, 0, 25))
     minimizeBtn.MouseButton1Click:Connect(function()
+        local tweens = {}
+        for _, child in pairs(Main:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                table.insert(tweens, TweenService:Create(child, TweenInfo.new(0.3), {BackgroundTransparency = 1, TextTransparency = 1}))
+            end
+        end
+        for _, tween in ipairs(tweens) do
+            tween:Play()
+        end
+        TweenService:Create(Main, TweenInfo.new(0.3), {BackgroundTransparency = 1}):Play():Wait()
         Main.Visible = false
         floatingButton.Visible = true
         showNotification("HUD minimizado!", "info")
     end)
 
-    -- Linha divisória abaixo das abas
     local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(1, -20, 0, 1)
-    divider.Position = UDim2.new(0, 10, 0, 40)
+    divider.Size = UDim2.new(0, 1, 1, -50)
+    divider.Position = UDim2.new(0, 140, 0, 40)
     divider.BackgroundColor3 = Color3.fromRGB(0, 255, 128)
     divider.BackgroundTransparency = 0.5
     divider.BorderSizePixel = 0
+    divider.ZIndex = 10000
     divider.Parent = Main
 
-    -- Criar páginas das abas
-    local movementPage = Instance.new("Frame")
-    movementPage.Size = UDim2.new(1, 0, 1, -50)
-    movementPage.Position = UDim2.new(0, 0, 0, 50)
-    movementPage.BackgroundTransparency = 1
-    movementPage.Visible = true
-    movementPage.Parent = Main
+    local miscPage = Instance.new("Frame")
+    miscPage.Size = UDim2.new(0, 440, 1, -50)
+    miscPage.Position = UDim2.new(0, 150, 0, 40)
+    miscPage.BackgroundTransparency = 1
+    miscPage.Visible = true
+    miscPage.ZIndex = 10000
+    miscPage.Parent = Main
 
     local logsPage = Instance.new("Frame")
-    logsPage.Size = UDim2.new(1, 0, 1, -50)
-    logsPage.Position = UDim2.new(0, 0, 0, 50)
+    logsPage.Size = UDim2.new(0, 440, 1, -50)
+    logsPage.Position = UDim2.new(0, 150, 0, 40)
     logsPage.BackgroundTransparency = 1
     logsPage.Visible = false
+    logsPage.ZIndex = 10000
     logsPage.Parent = Main
 
-    local playersPage = Instance.new("Frame")
-    playersPage.Size = UDim2.new(1, 0, 1, -50)
-    playersPage.Position = UDim2.new(0, 0, 0, 50)
-    playersPage.BackgroundTransparency = 1
-    playersPage.Visible = false
-    playersPage.Parent = Main
-
-    -- Função pra alternar entre abas
     local function switchTab(tab)
-        movementPage.Visible = (tab == "Movement")
+        miscPage.Visible = (tab == "Misc")
         logsPage.Visible = (tab == "Logs")
-        playersPage.Visible = (tab == "Players")
-        movementTabButton.BackgroundTransparency = (tab == "Movement") and 0.1 or 0.3
+        miscTabButton.BackgroundTransparency = (tab == "Misc") and 0.1 or 0.3
         logsTabButton.BackgroundTransparency = (tab == "Logs") and 0.1 or 0.3
-        playersTabButton.BackgroundTransparency = (tab == "Players") and 0.1 or 0.3
     end
 
-    movementTabButton.MouseButton1Click:Connect(function() switchTab("Movement") end)
+    miscTabButton.MouseButton1Click:Connect(function() switchTab("Misc") end)
     logsTabButton.MouseButton1Click:Connect(function() switchTab("Logs") end)
-    playersTabButton.MouseButton1Click:Connect(function() switchTab("Players") end)
 
-    -- Conteúdo da aba Movement
     local flyToggle = { state = false }
-    local flyFrame = createToggle("Fly", movementPage, UDim2.new(0, 10, 0, 10), flyToggle)
+    local flyFrame = createToggle("Fly", miscPage, UDim2.new(0, 10, 0, 10), flyToggle)
 
-    -- Slider de velocidade (à direita do Fly)
     local speedFrame = Instance.new("Frame")
-    speedFrame.Size = UDim2.new(0, 150, 0, 24)
-    speedFrame.Position = UDim2.new(0, 170, 0, 10)
+    speedFrame.Size = UDim2.new(0, 130, 0, 20)
+    speedFrame.Position = UDim2.new(0, 150, 0, 10)
     speedFrame.BackgroundTransparency = 1
     speedFrame.ZIndex = 10000
-    speedFrame.Parent = movementPage
+    speedFrame.Parent = miscPage
 
     local speedTrack = Instance.new("Frame")
     speedTrack.Size = UDim2.new(1, 0, 0, 4)
@@ -537,8 +530,8 @@ local success, err = pcall(function()
     neonify(speedTrack)
 
     local speedKnobContainer = Instance.new("Frame")
-    speedKnobContainer.Size = UDim2.new(0, 12, 0, 12)
-    speedKnobContainer.Position = UDim2.new((flySpeed - 20) / (200 - 20), -6, 0.5, -6)
+    speedKnobContainer.Size = UDim2.new(0, 10, 0, 10)
+    speedKnobContainer.Position = UDim2.new((flySpeed - 20) / (200 - 20), -5, 0.5, -5)
     speedKnobContainer.BackgroundTransparency = 1
     speedKnobContainer.ZIndex = 10002
     speedKnobContainer.Parent = speedTrack
@@ -550,24 +543,24 @@ local success, err = pcall(function()
     speedKnob.BackgroundTransparency = 0.1
     speedKnob.ZIndex = 10003
     speedKnob.Parent = speedKnobContainer
-    createUICorner(speedKnob, 6)
+    createUICorner(speedKnob, 5)
     neonify(speedKnob)
 
     local touchArea = Instance.new("TextButton")
-    touchArea.Size = UDim2.new(0, 24, 0, 24)
-    touchArea.Position = UDim2.new(0.5, -12, 0.5, -12)
+    touchArea.Size = UDim2.new(0, 20, 0, 20)
+    touchArea.Position = UDim2.new(0.5, -10, 0.5, -10)
     touchArea.BackgroundTransparency = 1
     touchArea.Text = ""
     touchArea.ZIndex = 10004
     touchArea.Parent = speedKnobContainer
 
     local speedLabel = Instance.new("TextLabel")
-    speedLabel.Size = UDim2.new(1, 0, 0, 16)
-    speedLabel.Position = UDim2.new(0, 0, 0, -16)
+    speedLabel.Size = UDim2.new(1, 0, 0, 14)
+    speedLabel.Position = UDim2.new(0, 0, 0, -14)
     speedLabel.BackgroundTransparency = 1
     speedLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     speedLabel.Text = "Velocidade: " .. flySpeed
-    speedLabel.TextSize = 12
+    speedLabel.TextSize = 10
     speedLabel.ZIndex = 10001
     speedLabel.Font = Enum.Font.Gotham
     speedLabel.Parent = speedFrame
@@ -580,7 +573,7 @@ local success, err = pcall(function()
         local trackWidth = speedTrack.AbsoluteSize.X
         local newPos = math.clamp((posX - trackPos) / trackWidth, 0, 1)
         flySpeed = math.floor(20 + (newPos * (200 - 20)))
-        speedKnobContainer.Position = UDim2.new(newPos, -6, 0.5, -6)
+        speedKnobContainer.Position = UDim2.new(newPos, -5, 0.5, -5)
         speedLabel.Text = "Velocidade: " .. flySpeed
     end
 
@@ -612,23 +605,106 @@ local success, err = pcall(function()
 
     addDebugLog("Slider de velocidade criado")
 
-    -- NoClip (abaixo do Fly)
     local noclipToggle = { state = false }
-    local noclipFrame = createToggle("NoClip", movementPage, UDim2.new(0, 10, 0, 40), noclipToggle)
+    local noclipFrame = createToggle("NoClip", miscPage, UDim2.new(0, 10, 0, 40), noclipToggle)
 
-    -- ESP (abaixo do NoClip)
     local espToggle = { state = false }
-    local espFrame = createToggle("ESP", movementPage, UDim2.new(0, 10, 0, 70), espToggle)
+    local espFrame = createToggle("ESP", miscPage, UDim2.new(0, 10, 0, 70), espToggle)
 
-    -- Função para gerenciar ESP
+    local teleportLabel = Instance.new("TextLabel")
+    teleportLabel.Size = UDim2.new(0, 80, 0, 20)
+    teleportLabel.Position = UDim2.new(0, 10, 0, 100)
+    teleportLabel.BackgroundTransparency = 1
+    teleportLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    teleportLabel.Text = "Teleporte"
+    teleportLabel.TextSize = 10
+    teleportLabel.TextXAlignment = Enum.TextXAlignment.Left
+    teleportLabel.Font = Enum.Font.Gotham
+    teleportLabel.ZIndex = 10001
+    teleportLabel.Parent = miscPage
+
+    local selectPlayerBtn = createButton("Selecionar Jogador", miscPage, UDim2.new(0, 150, 0, 100), UDim2.new(0, 100, 0, 20))
+    local playerListFrame = Instance.new("ScrollingFrame")
+    playerListFrame.Size = UDim2.new(0, 100, 0, 100)
+    playerListFrame.Position = UDim2.new(0, 150, 0, 125)
+    playerListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    playerListFrame.BackgroundTransparency = 0.1
+    playerListFrame.ScrollBarThickness = 4
+    playerListFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 128)
+    playerListFrame.Visible = false
+    playerListFrame.ZIndex = 10002
+    playerListFrame.Parent = miscPage
+    createUICorner(playerListFrame, 8)
+    neonify(playerListFrame)
+
+    local teleportBtn = createButton("Teleportar", miscPage, UDim2.new(0, 150, 0, 230), UDim2.new(0, 100, 0, 20))
+
+    local uiListLayout = Instance.new("UIListLayout")
+    uiListLayout.Padding = UDim.new(0, 5)
+    uiListLayout.Parent = playerListFrame
+
+    local function updatePlayerList()
+        for _, child in pairs(playerListFrame:GetChildren()) do
+            if child:IsA("TextButton") then
+                child:Destroy()
+            end
+        end
+
+        local players = Players:GetPlayers()
+        for _, player in ipairs(players) do
+            if player ~= LocalPlayer then
+                local btn = createButton(player.Name, playerListFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, -10, 0, 20))
+                btn.TextSize = 10
+                btn.MouseButton1Click:Connect(function()
+                    selectedPlayer = player
+                    selectPlayerBtn.Text = player.Name
+                    playerListFrame.Visible = false
+                end)
+            end
+        end
+
+        playerListFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
+    end
+
+    selectPlayerBtn.MouseButton1Click:Connect(function()
+        playerListFrame.Visible = not playerListFrame.Visible
+        if playerListFrame.Visible then
+            updatePlayerList()
+        end
+    end)
+
+    teleportBtn.MouseButton1Click:Connect(function()
+        if selectedPlayer then
+            local character = LocalPlayer.Character
+            local targetCharacter = selectedPlayer.Character
+            if character and targetCharacter then
+                local root = character:FindFirstChild("HumanoidRootPart")
+                local targetRoot = targetCharacter:FindFirstChild("HumanoidRootPart")
+                if root and targetRoot then
+                    root.CFrame = targetRoot.CFrame + Vector3.new(0, 0, 2)
+                    showNotification("Teleportado para " .. selectedPlayer.Name, "success")
+                    addDebugLog("Teleportado para " .. selectedPlayer.Name)
+                else
+                    showNotification("Erro: Personagem não encontrado", "error")
+                    addDebugLog("Erro: HumanoidRootPart não encontrado para teleporte")
+                end
+            end
+        else
+            showNotification("Erro: Selecione um jogador", "error")
+            addDebugLog("Erro: Nenhum jogador selecionado para teleporte")
+        end
+    end)
+
+    Players.PlayerAdded:Connect(updatePlayerList)
+    Players.PlayerRemoving:Connect(updatePlayerList)
+    addDebugLog("Sistema de teleporte adicionado")
+
     local espHighlights = {}
     local function updateESP(state)
-        local players = game:GetService("Players"):GetPlayers()
-        local localPlayer = game:GetService("Players").LocalPlayer
-
+        local players = Players:GetPlayers()
         if state then
             for _, player in ipairs(players) do
-                if player ~= localPlayer and player.Character then
+                if player ~= LocalPlayer and player.Character then
                     local highlight = Instance.new("Highlight")
                     highlight.Name = "DevHubESP"
                     highlight.FillColor = Color3.fromRGB(0, 255, 128)
@@ -655,7 +731,7 @@ local success, err = pcall(function()
         addDebugLog(state and "ESP ativado" or "ESP desativado")
     end
 
-    game:GetService("Players").PlayerAdded:Connect(function(player)
+    Players.PlayerAdded:Connect(function(player)
         if espToggle.state and player.Character then
             local highlight = Instance.new("Highlight")
             highlight.Name = "DevHubESP"
@@ -668,7 +744,7 @@ local success, err = pcall(function()
         end
     end)
 
-    game:GetService("Players").PlayerRemoving:Connect(function(player)
+    Players.PlayerRemoving:Connect(function(player)
         if espHighlights[player] then
             espHighlights[player]:Destroy()
             espHighlights[player] = nil
@@ -676,12 +752,12 @@ local success, err = pcall(function()
     end)
     addDebugLog("Sistema de ESP adicionado")
 
-    -- Função para gerenciar o fly
     local flyControlFrame = Instance.new("Frame")
-    flyControlFrame.Size = UDim2.new(0, 100, 0, 100)
-    flyControlFrame.Position = UDim2.new(1, -120, 0.5, -50)
+    flyControlFrame.Size = UDim2.new(0, 80, 0, 80)
+    flyControlFrame.Position = UDim2.new(1, -100, 0.5, -40)
     flyControlFrame.BackgroundTransparency = 1
     flyControlFrame.Visible = false
+    flyControlFrame.ZIndex = 10000
     flyControlFrame.Parent = ScreenGui
 
     local upBtn = createButton("↑", flyControlFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0.5, -5))
@@ -725,7 +801,6 @@ local success, err = pcall(function()
         end
     end
 
-    -- Configurar o toggle de fly
     flyToggle.onToggle = function(state)
         flying = state
         local character = LocalPlayer.Character
@@ -735,7 +810,7 @@ local success, err = pcall(function()
             addDebugLog("Erro: Não foi possível ativar fly - personagem não carregado")
             flying = false
             flyToggle.state = false
-            createToggle("Fly", movementPage, UDim2.new(0, 10, 0, 10), flyToggle)
+            createToggle("Fly", miscPage, UDim2.new(0, 10, 0, 10), flyToggle)
             showNotification("Erro: Personagem não carregado", "error")
             return
         end
@@ -769,7 +844,6 @@ local success, err = pcall(function()
         end
     end
 
-    -- Configurar o toggle de noclip
     noclipToggle.onToggle = function(state)
         noclip = state
         if state then
@@ -804,124 +878,12 @@ local success, err = pcall(function()
         end
     end
 
-    -- Conteúdo da aba Logs
     local logBtn = createButton("Ver Logs", logsPage, UDim2.new(0, 10, 0, 10))
     logBtn.MouseButton1Click:Connect(function()
         createLogWindow()
         showNotification("Logs abertos!", "info")
     end)
 
-    local commandBox = Instance.new("TextBox")
-    commandBox.Size = UDim2.new(1, -20, 0, 30)
-    commandBox.Position = UDim2.new(0, 10, 0, 50)
-    commandBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    commandBox.BackgroundTransparency = 0.1
-    commandBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    commandBox.PlaceholderText = "Digite um comando Lua..."
-    commandBox.Text = ""
-    commandBox.TextSize = 14
-    commandBox.Font = Enum.Font.Gotham
-    commandBox.ZIndex = 10001
-    commandBox.Parent = logsPage
-    createUICorner(commandBox, 8)
-    neonify(commandBox)
-
-    commandBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed and commandBox.Text ~= "" then
-            local success, result = pcall(function()
-                local func = loadstring(commandBox.Text)
-                if func then
-                    return func()
-                else
-                    error("Comando inválido")
-                end
-            end)
-            if success then
-                showNotification("Comando executado com sucesso!", "success")
-                addDebugLog("Comando executado: " .. commandBox.Text)
-            else
-                showNotification("Erro: " .. tostring(result), "error")
-                addDebugLog("Erro ao executar comando: " .. tostring(result))
-            end
-            commandBox.Text = ""
-        end
-    end)
-    addDebugLog("Campo de comando adicionado à aba Logs")
-
-    -- Conteúdo da aba Players
-    local scrollFrame = Instance.new("ScrollingFrame")
-    scrollFrame.Size = UDim2.new(1, -20, 1, -60)
-    scrollFrame.Position = UDim2.new(0, 10, 0, 10)
-    scrollFrame.BackgroundTransparency = 1
-    scrollFrame.ScrollBarThickness = 4
-    scrollFrame.ScrollBarImageColor3 = Color3.fromRGB(0, 255, 128)
-    scrollFrame.ZIndex = 10001
-    scrollFrame.Parent = playersPage
-
-    local uiListLayout = Instance.new("UIListLayout")
-    uiListLayout.Padding = UDim.new(0, 5)
-    uiListLayout.Parent = scrollFrame
-
-    local searchBox = Instance.new("TextBox")
-    searchBox.Size = UDim2.new(1, -20, 0, 30)
-    searchBox.Position = UDim2.new(0, 10, 1, -40)
-    searchBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    searchBox.BackgroundTransparency = 0.1
-    searchBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    searchBox.PlaceholderText = "Buscar jogador..."
-    searchBox.Text = ""
-    searchBox.TextSize = 14
-    searchBox.Font = Enum.Font.Gotham
-    searchBox.ZIndex = 10001
-    searchBox.Parent = playersPage
-    createUICorner(searchBox, 8)
-    neonify(searchBox)
-
-    local function updatePlayerList(filter)
-        for _, child in pairs(scrollFrame:GetChildren()) do
-            if child:IsA("TextButton") then
-                child:Destroy()
-            end
-        end
-
-        local players = game:GetService("Players"):GetPlayers()
-        local localPlayer = game:GetService("Players").LocalPlayer
-
-        for _, player in ipairs(players) do
-            if player ~= localPlayer and (not filter or string.find(string.lower(player.Name), string.lower(filter))) then
-                local btn = createButton(player.Name, scrollFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, -10, 0, 30))
-                btn.MouseButton1Click:Connect(function()
-                    local character = localPlayer.Character
-                    local targetCharacter = player.Character
-                    if character and targetCharacter then
-                        local root = character:FindFirstChild("HumanoidRootPart")
-                        local targetRoot = targetCharacter:FindFirstChild("HumanoidRootPart")
-                        if root and targetRoot then
-                            root.CFrame = targetRoot.CFrame + Vector3.new(0, 0, 2)
-                            showNotification("Teleportado para " .. player.Name, "success")
-                            addDebugLog("Teleportado para " .. player.Name)
-                        else
-                            showNotification("Erro: Personagem não encontrado", "error")
-                            addDebugLog("Erro: HumanoidRootPart não encontrado para teleporte")
-                        end
-                    end
-                end)
-            end
-        end
-
-        scrollFrame.CanvasSize = UDim2.new(0, 0, 0, uiListLayout.AbsoluteContentSize.Y)
-    end
-
-    updatePlayerList()
-    game:GetService("Players").PlayerAdded:Connect(function() updatePlayerList(searchBox.Text) end)
-    game:GetService("Players").PlayerRemoving:Connect(function() updatePlayerList(searchBox.Text) end)
-
-    searchBox:GetPropertyChangedSignal("Text"):Connect(function()
-        updatePlayerList(searchBox.Text)
-    end)
-    addDebugLog("Aba de jogadores criada com sucesso")
-
-    -- Sistema de arrastar
     local function makeDraggable(gui, targetFrame)
         local dragging = false
         local dragStart
@@ -958,9 +920,18 @@ local success, err = pcall(function()
     makeDraggable(floatingButton, floatingButton)
     makeDraggable(flyControlFrame, flyControlFrame)
 
-    -- Conectar botão flutuante
     floatingButton.MouseButton1Click:Connect(function()
         Main.Visible = true
+        local tweens = {}
+        for _, child in pairs(Main:GetDescendants()) do
+            if child:IsA("GuiObject") then
+                table.insert(tweens, TweenService:Create(child, TweenInfo.new(0.3), {BackgroundTransparency = child.BackgroundTransparency - 0.1, TextTransparency = 0}))
+            end
+        end
+        for _, tween in ipairs(tweens) do
+            tween:Play()
+        end
+        TweenService:Create(Main, TweenInfo.new(0.3), {BackgroundTransparency = 0.1}):Play()
         floatingButton.Visible = false
         showNotification("HUD aberto!", "info")
     end)
