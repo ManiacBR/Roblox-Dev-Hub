@@ -124,7 +124,14 @@ local function createLogWindow()
     filterFrame.BackgroundTransparency = 0.1
     filterFrame.ZIndex = 10002
     filterFrame.Parent = logFrame
+
+    local function createUICorner(obj, rad)
+        local uic = Instance.new("UICorner")
+        uic.CornerRadius = UDim.new(0, rad)
+        uic.Parent = obj
+    end
     createUICorner(filterFrame, 8)
+
     local strokeFilter = Instance.new("UIStroke")
     strokeFilter.Color = Color3.fromRGB(0, 255, 128)
     strokeFilter.Thickness = 1
@@ -150,6 +157,7 @@ local function createLogWindow()
     filterOptions.Visible = false
     filterOptions.Parent = filterFrame
     createUICorner(filterOptions, 8)
+
     local strokeOptions = Instance.new("UIStroke")
     strokeOptions.Color = Color3.fromRGB(0, 255, 128)
     strokeOptions.Thickness = 1
@@ -166,7 +174,7 @@ local function createLogWindow()
         btn.TextSize = 12
         btn.ZIndex = 10005
         btn.Font = Enum.Font.Gotham
-        btn.Parent = filterOptions
+        btn.Parent = filterOffset
         btn.MouseButton1Click:Connect(function()
             logFilter = name
             filterBtn.Text = name
@@ -185,9 +193,7 @@ local function createLogWindow()
 
     createFilterOption("Todos", UDim2.new(0, 0, 0, 0))
     createFilterOption("Erros", UDim2.new(0, 0, 0, 20))
-    createFilterOption("Notificações", UDim2.new(0, 0, 0, 40))
-
-    filterBtn.MouseButton1Click:Connect(function()
+    createFilterOption("Notificações", UDim2.new(0, 0, 0, 40))filterBtn.MouseButton1Click:Connect(function()
         filterOptions.Visible = not filterOptions.Visible
     end)
 
@@ -220,7 +226,7 @@ local function createLogWindow()
     closeBtn.Text = "Fechar"
     closeBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     closeBtn.BackgroundTransparency = 0.1
-    closeBtn.TextSize = 14
+    copyBtn.TextSize = 14
     closeBtn.ZIndex = 10002
     closeBtn.Font = Enum.Font.Gotham
     closeBtn.Parent = logFrame
@@ -551,7 +557,7 @@ local success, err = pcall(function()
         return toggleFrame
     end
 
-     -- Função para gerenciar o fly
+    -- Função para gerenciar o fly
     local flyControlFrame = Instance.new("Frame")
     flyControlFrame.Size = UDim2.new(0, 100, 0, 100)
     flyControlFrame.Position = UDim2.new(1, -120, 0.5, -50)
@@ -563,8 +569,7 @@ local success, err = pcall(function()
     upBtn.MouseButton1Down:Connect(function() verticalFly = 1 end)
     upBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
 
-    local downBtn = createButton("↓", flyControlFrame, UDim2.new(0, 0, 0.5, 5), UDim2.new(1, 0, 0.5, -5))
-    downBtn.MouseButton1Down:Connect(function() verticalFly = -1 end)
+    local downBtn = createButton("↓", flyControlFrame, UDim2.new(0, 0, 0.5, 5), UDim2.new(1, 0, 0.5, -5))downBtn.MouseButton1Down:Connect(function() verticalFly = -1 end)
     downBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
 
     local function updateFly()
@@ -635,7 +640,9 @@ local success, err = pcall(function()
 
     makeDraggable(dragBar, Main)
     makeDraggable(floatingButton, floatingButton)
-    makeDraggable(flyControlFrame, flyControlFrame)-- Criar frame de abas
+    makeDraggable(flyControlFrame, flyControlFrame)
+
+    -- Criar frame de abas
     local tabButtonsFrame = Instance.new("Frame")
     tabButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
     tabButtonsFrame.BackgroundTransparency = 1
