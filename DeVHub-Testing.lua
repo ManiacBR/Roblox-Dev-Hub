@@ -12,7 +12,7 @@ local floatingButton
 local adminPage, playerPage, gamePage, gamepassPage, logsPage
 local adminTabButton, playerTabButton, gameTabButton, gamepassTabButton, logsTabButton
 local logText -- Usado pelo sistema de logs
-local debugLogWindow -- Janela de logs separada
+local debugLogWindow -- Janela de logs forçada
 
 -- Sistema de logs
 local debugLog = {}
@@ -34,7 +34,7 @@ local function addDebugLog(message, logType)
     if logText then
         logText.Text = "Logs:\n" .. debugLogString
     end
-    -- Atualizar a janela de logs separada, se existir
+    -- Atualizar a janela de logs forçada, se existir
     if debugLogWindow and debugLogWindow:FindFirstChild("LogText") then
         debugLogWindow.LogText.Text = "Logs:\n" .. debugLogString
     end
@@ -51,7 +51,7 @@ local function showNotification(message)
     notification.Text = message
     notification.TextSize = 14
     notification.Font = Enum.Font.Gotham
-    notification.ZIndex = 10010
+    notification.ZIndex = 100010
     local uic = Instance.new("UICorner")
     uic.CornerRadius = UDim.new(0, 10)
     uic.Parent = notification
@@ -77,14 +77,14 @@ end
 
 addDebugLog("Sistema de notificações carregado", "Notificações")
 
--- Função para criar a janela de logs (usada tanto na aba quanto na janela separada)
+-- Função para criar a janela de logs (usada tanto na aba quanto na janela forçada)
 local function createLogWindow(parent)
     local logFrame = Instance.new("Frame")
     logFrame.Size = UDim2.new(1, -20, 1, -50)
     logFrame.Position = UDim2.new(0, 10, 0, 40)
     logFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     logFrame.BackgroundTransparency = 0.1
-    logFrame.ZIndex = 10000
+    logFrame.ZIndex = 100000
     local uic = Instance.new("UICorner")
     uic.CornerRadius = UDim.new(0, 10)
     uic.Parent = logFrame
@@ -106,7 +106,7 @@ local function createLogWindow(parent)
     logText.TextXAlignment = Enum.TextXAlignment.Left
     logText.TextYAlignment = Enum.TextYAlignment.Top
     logText.Font = Enum.Font.Gotham
-    logText.ZIndex = 10001
+    logText.ZIndex = 100001
     logText.Parent = logFrame
 
     local filterBtn = createButton(logFilter, logFrame, UDim2.new(0, 10, 0, 0), UDim2.new(0, 100, 0, 20))
@@ -117,7 +117,7 @@ local function createLogWindow(parent)
     filterOptions.Position = UDim2.new(1, -110, 0, 30)
     filterOptions.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     filterOptions.BackgroundTransparency = 0.1
-    filterOptions.ZIndex = 10004
+    filterOptions.ZIndex = 100004
     filterOptions.Visible = false
     filterOptions.Parent = logFrame
     local uicFilter = Instance.new("UICorner")
@@ -137,7 +137,7 @@ local function createLogWindow(parent)
         btn.Text = name
         btn.BackgroundTransparency = 0.1
         btn.TextSize = 12
-        btn.ZIndex = 10005
+        btn.ZIndex = 100005
         btn.Font = Enum.Font.Gotham
         btn.Parent = filterOptions
         btn.MouseButton1Click:Connect(function()
@@ -155,6 +155,7 @@ local function createLogWindow(parent)
             if debugLogWindow and debugLogWindow:FindFirstChild("LogText") then
                 debugLogWindow.LogText.Text = "Logs:\n" .. debugLogString
             end
+            addDebugLog("Filtro de logs alterado para: " .. name, "Notificações")
         end)
     end
 
@@ -164,6 +165,7 @@ local function createLogWindow(parent)
 
     filterBtn.MouseButton1Click:Connect(function()
         filterOptions.Visible = not filterOptions.Visible
+        addDebugLog("Menu de filtros de logs " .. (filterOptions.Visible and "aberto" or "fechado"), "Notificações")
     end)
 
     local lastLogTime = 0
@@ -232,7 +234,7 @@ local function initialize()
     local settings = getgenv().DevHubSettings
 
     -- Criar ScreenGui
-    local ScreenGui = Instance.new("ScreenGui")
+    ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "DevHubUI"
     ScreenGui.ResetOnSpawn = false
     ScreenGui.IgnoreGuiInset = true
@@ -291,48 +293,6 @@ local function initialize()
         stroke.Transparency = 0.5
         stroke.Parent = obj
     end
-
-    -- Criar botão flutuante
-    floatingButton = Instance.new("TextButton")
-    floatingButton.Size = UDim2.new(0, 50, 0, 50)
-    floatingButton.Position = UDim2.new(0, 20, 0.5, -25)
-    floatingButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    floatingButton.Text = "≡"
-    floatingButton.ZIndex = 10000
-    floatingButton.Font = Enum.Font.Gotham
-    floatingButton.TextSize = 20
-    floatingButton.Parent = ScreenGui
-    createUICorner(floatingButton, 10)
-    neonify(floatingButton)
-    addDebugLog("Botão flutuante criado com sucesso", "Notificações")
-
-    floatingButton.MouseButton1Click:Connect(function()
-        print("Botão flutuante clicado!")
-        Main.Visible = not Main.Visible
-        floatingButton.Visible = not Main.Visible
-        addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via botão flutuante", "Notificações")
-    end)
-    
-    -- Criar frame principal (HUD)
-    Main = Instance.new("Frame")
-    Main.Size = UDim2.new(0, 500, 0, 350) -- Aumentado para caber mais abas
-    Main.Position = UDim2.new(0.5, -250, 0.5, -175)
-    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Main.BackgroundTransparency = 0.1
-    Main.Visible = false
-    Main.ZIndex = 100000 -- Aumentado pra evitar sobreposição
-    Main.Parent = ScreenGui
-    createUICorner(Main, 20)
-    neonify(Main)
-    addDebugLog("Frame principal criado com sucesso", "Notificações")
-
-    -- Criar área de arrastar (topo da HUD)
-    local dragBar = Instance.new("Frame")
-    dragBar.Size = UDim2.new(1, 0, 0, 40)
-    dragBar.Position = UDim2.new(0, 0, 0, 0)
-    dragBar.BackgroundTransparency = 1
-    dragBar.ZIndex = 100002
-    dragBar.Parent = Main
 
     -- Função pra criar botões com hover
     local function createButton(text, parent, position, size, isTab)
@@ -433,54 +393,211 @@ local function initialize()
         return toggleFrame
     end
 
-    -- Função para gerenciar o fly
-    local flyControlFrame = Instance.new("Frame")
-    flyControlFrame.Size = UDim2.new(0, 100, 0, 100)
-    flyControlFrame.Position = UDim2.new(1, -120, 0.5, -50)
-    flyControlFrame.BackgroundTransparency = 1
-    flyControlFrame.Visible = false
-    flyControlFrame.Parent = ScreenGui
+    -- Criar botão flutuante
+    floatingButton = Instance.new("TextButton")
+    floatingButton.Size = UDim2.new(0, 50, 0, 50)
+    floatingButton.Position = UDim2.new(0, 20, 0.5, -25)
+    floatingButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    floatingButton.Text = "≡"
+    floatingButton.ZIndex = 100000
+    floatingButton.Font = Enum.Font.Gotham
+    floatingButton.TextSize = 20
+    floatingButton.Parent = ScreenGui
+    createUICorner(floatingButton, 10)
+    neonify(floatingButton)
+    addDebugLog("Botão flutuante criado com sucesso", "Notificações")
 
-    local upBtn = createButton("↑", flyControlFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0.5, -5))
-    upBtn.MouseButton1Down:Connect(function() verticalFly = 1 end)
-    upBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
+    floatingButton.MouseButton1Click:Connect(function()
+        Main.Visible = not Main.Visible
+        floatingButton.Visible = not Main.Visible
+        addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via botão flutuante", "Notificações")
+    end)
 
-    local downBtn = createButton("↓", flyControlFrame, UDim2.new(0, 0, 0.5, 5), UDim2.new(1, 0, 0.5, -5))
-    downBtn.MouseButton1Down:Connect(function() verticalFly = -1 end)
-    downBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
+    -- Criar frame principal (HUD)
+    Main = Instance.new("Frame")
+    Main.Size = UDim2.new(0, 500, 0, 350) -- Aumentado para caber mais abas
+    Main.Position = UDim2.new(0.5, -250, 0.5, -175)
+    Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Main.BackgroundTransparency = 0.1
+    Main.Visible = false
+    Main.ZIndex = 100000 -- Aumentado pra evitar sobreposição
+    Main.Parent = ScreenGui
+    createUICorner(Main, 20)
+    neonify(Main)
+    addDebugLog("Frame principal criado com sucesso", "Notificações")
 
-    local function updateFly()
-        local character = LocalPlayer.Character
-        local root = character and character:FindFirstChild("HumanoidRootPart")
-        local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-        local cam = workspace.CurrentCamera
-        if not root or not humanoid then
-            addDebugLog("Erro: Personagem ou HumanoidRootPart não encontrado", "Erros")
-            return
-        end
+    -- Criar área de arrastar (topo da HUD)
+    local dragBar = Instance.new("Frame")
+    dragBar.Size = UDim2.new(1, 0, 0, 40)
+    dragBar.Position = UDim2.new(0, 0, 0, 0)
+    dragBar.BackgroundTransparency = 1
+    dragBar.ZIndex = 100002
+    dragBar.Parent = Main
 
-        local camCF = cam.CFrame
-        local forward = camCF.LookVector
-        local right = camCF.RightVector
+    -- Criar botões de controle (Reset, Minimizar, Fechar) no topo direito
+    local resetBtn = createButton("Reset", dragBar, UDim2.new(1, -140, 0, 5), UDim2.new(0, 60, 0, 30))
+    local closeBtn = createButton("X", dragBar, UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30))
+    closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
+    local minimizeBtn = createButton("−", dragBar, UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30))
 
-        local moveVec = Vector3.zero
-        local inputX, inputY, inputZ = 0, verticalFly, 0
+    -- Adicionar eventos aos botões de controle
+    local function closeHUD()
+        Main.Visible = false
+        floatingButton.Visible = true
+        addDebugLog("HUD fechado", "Notificações")
+    end
 
-        if UserInputService:GetLastInputType() == Enum.UserInputType.Touch then
-            moveVec = humanoid.MoveDirection + Vector3.new(0, verticalFly, 0)
+    closeBtn.MouseButton1Click:Connect(function()
+        closeHUD()
+        addDebugLog("HUD fechado via botão X", "Notificações")
+    end)
+
+    minimizeBtn.MouseButton1Click:Connect(function()
+        closeHUD()
+        addDebugLog("HUD minimizado (fechado) via botão −", "Notificações")
+    end)
+
+    resetBtn.MouseButton1Click:Connect(function()
+        Main.Position = UDim2.new(0.5, -250, 0.5, -175)
+        addDebugLog("Posição do HUD resetada", "Notificações")
+    end)
+
+    -- Criar frame para as abas (à esquerda)
+    local tabButtonsFrame = Instance.new("Frame")
+    tabButtonsFrame.Size = UDim2.new(0, 120, 1, -50) -- 120 pixels de largura, altura ajustada para caber abaixo da dragBar
+    tabButtonsFrame.Position = UDim2.new(0, 10, 0, 50)
+    tabButtonsFrame.BackgroundTransparency = 1
+    tabButtonsFrame.ZIndex = 100001
+    tabButtonsFrame.Parent = Main
+
+    -- Criar frame para o conteúdo das abas (à direita)
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Size = UDim2.new(1, -140, 1, -50) -- Ocupa o espaço restante à direita
+    contentFrame.Position = UDim2.new(0, 130, 0, 50)
+    contentFrame.BackgroundTransparency = 1
+    contentFrame.ZIndex = 100001
+    contentFrame.Parent = Main
+
+    -- Criar botões das abas (listados verticalmente à esquerda)
+    adminTabButton = createButton("Admin", tabButtonsFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 30), true)
+    playerTabButton = createButton("Player", tabButtonsFrame, UDim2.new(0, 0, 0, 35), UDim2.new(1, 0, 0, 30), true)
+    gameTabButton = createButton("Game", tabButtonsFrame, UDim2.new(0, 0, 0, 70), UDim2.new(1, 0, 0, 30), true)
+    gamepassTabButton = createButton("Gamepass", tabButtonsFrame, UDim2.new(0, 0, 0, 105), UDim2.new(1, 0, 0, 30), true)
+    logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 0, 0, 140), UDim2.new(1, 0, 0, 30), true)
+
+    -- Linha divisória vertical entre abas e conteúdo
+    local divider = Instance.new("Frame")
+    divider.Size = UDim2.new(0, 1, 1, -60)
+    divider.Position = UDim2.new(0, 125, 0, 50)
+    divider.BackgroundColor3 = Color3.fromRGB(0, 255, 128)
+    divider.BackgroundTransparency = 0.5
+    divider.BorderSizePixel = 0
+    divider.ZIndex = 100001
+    divider.Parent = Main
+
+    -- Criar páginas das abas (agora dentro do contentFrame)
+    adminPage = Instance.new("Frame")
+    adminPage.Size = UDim2.new(1, 0, 1, 0)
+    adminPage.Position = UDim2.new(0, 0, 0, 0)
+    adminPage.BackgroundTransparency = 1
+    adminPage.ZIndex = 100002
+    adminPage.Visible = true
+    adminPage.Parent = contentFrame
+    local adminLabel = Instance.new("TextLabel")
+    adminLabel.Size = UDim2.new(1, 0, 1, 0)
+    adminLabel.BackgroundTransparency = 1
+    adminLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    adminLabel.Text = "Aba Admin - Em Construção"
+    adminLabel.TextSize = 14
+    adminLabel.Font = Enum.Font.Gotham
+    adminLabel.ZIndex = 100003
+    adminLabel.Parent = adminPage
+
+    playerPage = Instance.new("Frame")
+    playerPage.Size = UDim2.new(1, 0, 1, 0)
+    playerPage.Position = UDim2.new(0, 0, 0, 0)
+    playerPage.BackgroundTransparency = 1
+    playerPage.ZIndex = 100002
+    playerPage.Visible = false
+    playerPage.Parent = contentFrame
+    local playerLabel = Instance.new("TextLabel")
+    playerLabel.Size = UDim2.new(1, 0, 1, 0)
+    playerLabel.BackgroundTransparency = 1
+    playerLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    playerLabel.Text = "Aba Player - Em Construção"
+    playerLabel.TextSize = 14
+    playerLabel.Font = Enum.Font.Gotham
+    playerLabel.ZIndex = 100003
+    playerLabel.Parent = playerPage
+
+    gamePage = Instance.new("Frame")
+    gamePage.Size = UDim2.new(1, 0, 1, 0)
+    gamePage.Position = UDim2.new(0, 0, 0, 0)
+    gamePage.BackgroundTransparency = 1
+    gamePage.ZIndex = 100002
+    gamePage.Visible = false
+    gamePage.Parent = contentFrame
+    local gameLabel = Instance.new("TextLabel")
+    gameLabel.Size = UDim2.new(1, 0, 1, 0)
+    gameLabel.BackgroundTransparency = 1
+    gameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    gameLabel.Text = "Aba Game - Em Construção"
+    gameLabel.TextSize = 14
+    gameLabel.Font = Enum.Font.Gotham
+    gameLabel.ZIndex = 100003
+    gameLabel.Parent = gamePage
+
+    gamepassPage = Instance.new("Frame")
+    gamepassPage.Size = UDim2.new(1, 0, 1, 0)
+    gamepassPage.Position = UDim2.new(0, 0, 0, 0)
+    gamepassPage.BackgroundTransparency = 1
+    gamepassPage.ZIndex = 100002
+    gamepassPage.Visible = false
+    gamepassPage.Parent = contentFrame
+    local gamepassLabel = Instance.new("TextLabel")
+    gamepassLabel.Size = UDim2.new(1, 0, 1, 0)
+    gamepassLabel.BackgroundTransparency = 1
+    gamepassLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    gamepassLabel.Text = "Aba Gamepass - Em Construção"
+    gamepassLabel.TextSize = 14
+    gamepassLabel.Font = Enum.Font.Gotham
+    gamepassLabel.ZIndex = 100003
+    gamepassLabel.Parent = gamepassPage
+
+    logsPage = Instance.new("Frame")
+    logsPage.Size = UDim2.new(1, 0, 1, 0)
+    logsPage.Position = UDim2.new(0, 0, 0, 0)
+    logsPage.BackgroundTransparency = 1
+    logsPage.ZIndex = 100002
+    logsPage.Visible = false
+    logsPage.Parent = contentFrame
+    createLogWindow(logsPage)
+
+    -- Função pra alternar entre abas
+    local function switchTab(tab)
+        addDebugLog("Tentando alternar para aba: " .. tab, "Notificações")
+        if adminPage and playerPage and gamePage and gamepassPage and logsPage then
+            adminPage.Visible = (tab == "Admin")
+            playerPage.Visible = (tab == "Player")
+            gamePage.Visible = (tab == "Game")
+            gamepassPage.Visible = (tab == "Gamepass")
+            logsPage.Visible = (tab == "Logs")
+            adminTabButton.BackgroundTransparency = (tab == "Admin") and 0.1 or 0.3
+            playerTabButton.BackgroundTransparency = (tab == "Player") and 0.1 or 0.3
+            gameTabButton.BackgroundTransparency = (tab == "Game") and 0.1 or 0.3
+            gamepassTabButton.BackgroundTransparency = (tab == "Gamepass") and 0.1 or 0.3
+            logsTabButton.BackgroundTransparency = (tab == "Logs") and 0.1 or 0.3
+            addDebugLog("Aba " .. tab .. " selecionada com sucesso", "Notificações")
         else
-            if UserInputService:IsKeyDown(Enum.KeyCode.W) then inputZ = inputZ - 1 end
-            if UserInputService:IsKeyDown(Enum.KeyCode.S) then inputZ = inputZ + 1 end
-            if UserInputService:IsKeyDown(Enum.KeyCode.A) then inputX = inputX - 1 end
-            if UserInputService:IsKeyDown(Enum.KeyCode.D) then inputX = inputX + 1 end
-            moveVec = (right * inputX) + (forward * inputZ) + Vector3.new(0, verticalFly, 0)
-        end
-
-        if moveVec.Magnitude > 1 then moveVec = moveVec.Unit end
-        if bodyVelocity then
-            bodyVelocity.Velocity = moveVec * flySpeed
+            addDebugLog("Erro: Alguma página das abas não foi encontrada", "Erros")
         end
     end
+
+    adminTabButton.MouseButton1Click:Connect(function() switchTab("Admin") end)
+    playerTabButton.MouseButton1Click:Connect(function() switchTab("Player") end)
+    gameTabButton.MouseButton1Click:Connect(function() switchTab("Game") end)
+    gamepassTabButton.MouseButton1Click:Connect(function() switchTab("Gamepass") end)
+    logsTabButton.MouseButton1Click:Connect(function() switchTab("Logs") end)
 
     -- Sistema de arrastar
     local function makeDraggable(gui, targetFrame)
@@ -517,133 +634,26 @@ local function initialize()
 
     makeDraggable(dragBar, Main)
     makeDraggable(floatingButton, floatingButton)
-    makeDraggable(flyControlFrame, flyControlFrame)
 
-    -- Criar frame para as abas (à esquerda)
-    local tabButtonsFrame = Instance.new("Frame")
-    tabButtonsFrame.Size = UDim2.new(0, 120, 1, -50) -- 120 pixels de largura, altura ajustada para caber abaixo da dragBar
-    tabButtonsFrame.Position = UDim2.new(0, 10, 0, 50)
-    tabButtonsFrame.BackgroundTransparency = 1
-    tabButtonsFrame.Parent = Main
-
-    -- Criar frame para o conteúdo das abas (à direita)
-    local contentFrame = Instance.new("Frame")
-    contentFrame.Size = UDim2.new(1, -140, 1, -50) -- Ocupa o espaço restante à direita
-    contentFrame.Position = UDim2.new(0, 130, 0, 50)
-    contentFrame.BackgroundTransparency = 1
-    contentFrame.Parent = Main
-
-    -- Criar botões de controle (Reset, Minimizar, Fechar) no topo direito
-    local resetBtn = createButton("Reset", dragBar, UDim2.new(1, -140, 0, 5), UDim2.new(0, 60, 0, 30))
-    local closeBtn = createButton("X", dragBar, UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30))
-    closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-    local minimizeBtn = createButton("−", dragBar, UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30))
-
-    -- Adicionar eventos aos botões de controle
-    closeBtn.MouseButton1Click:Connect(function()
-        Main.Visible = false
-        floatingButton.Visible = true
-        addDebugLog("HUD fechado via botão X", "Notificações")
-    end)
-
-    local isMinimized = false
-    local originalSize = Main.Size
-    local minimizedSize = UDim2.new(0, 200, 0, 40)
-    minimizeBtn.MouseButton1Click:Connect(function()
-        if isMinimized then
-            Main.Size = originalSize
-            Main.Position = UDim2.new(0.5, -250, 0.5, -175)
-            minimizeBtn.Text = "−"
-            addDebugLog("HUD restaurado", "Notificações")
-        else
-            Main.Size = minimizedSize
-            Main.Position = UDim2.new(0.5, -100, 0, 0)
-            minimizeBtn.Text = "+"
-            addDebugLog("HUD minimizado", "Notificações")
-        end
-        isMinimized = not isMinimized
-    end)
-
-    resetBtn.MouseButton1Click:Connect(function()
-        Main.Position = UDim2.new(0.5, -250, 0.5, -175)
-        addDebugLog("Posição do HUD resetada", "Notificações")
-    end)
-
-    -- Criar botões das abas (listados verticalmente à esquerda)
-    adminTabButton = createButton("Admin", tabButtonsFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 30), true)
-    playerTabButton = createButton("Player", tabButtonsFrame, UDim2.new(0, 0, 0, 35), UDim2.new(1, 0, 0, 30), true)
-    gameTabButton = createButton("Game", tabButtonsFrame, UDim2.new(0, 0, 0, 70), UDim2.new(1, 0, 0, 30), true)
-    gamepassTabButton = createButton("Gamepass", tabButtonsFrame, UDim2.new(0, 0, 0, 105), UDim2.new(1, 0, 0, 30), true)
-    logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 0, 0, 140), UDim2.new(1, 0, 0, 30), true)
-
-    -- Linha divisória vertical entre abas e conteúdo
-    local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(0, 1, 1, -60)
-    divider.Position = UDim2.new(0, 125, 0, 50)
-    divider.BackgroundColor3 = Color3.fromRGB(0, 255, 128)
-    divider.BackgroundTransparency = 0.5
-    divider.BorderSizePixel = 0
-    divider.Parent = Main
-
-    -- Criar páginas das abas (agora dentro do contentFrame)
-    adminPage = Instance.new("Frame")
-    adminPage.Size = UDim2.new(1, 0, 1, 0)
-    adminPage.Position = UDim2.new(0, 0, 0, 0)
-    adminPage.BackgroundTransparency = 1
-    adminPage.Visible = true
-    adminPage.Parent = contentFrame
-
-    playerPage = Instance.new("Frame")
-    playerPage.Size = UDim2.new(1, 0, 1, 0)
-    playerPage.Position = UDim2.new(0, 0, 0, 0)
-    playerPage.BackgroundTransparency = 1
-    playerPage.Visible = false
-    playerPage.Parent = contentFrame
-
-    gamePage = Instance.new("Frame")
-    gamePage.Size = UDim2.new(1, 0, 1, 0)
-    gamePage.Position = UDim2.new(0, 0, 0, 0)
-    gamePage.BackgroundTransparency = 1
-    gamePage.Visible = false
-    gamePage.Parent = contentFrame
-
-    gamepassPage = Instance.new("Frame")
-    gamepassPage.Size = UDim2.new(1, 0, 1, 0)
-    gamepassPage.Position = UDim2.new(0, 0, 0, 0)
-    gamepassPage.BackgroundTransparency = 1
-    gamepassPage.Visible = false
-    gamepassPage.Parent = contentFrame
-
-    logsPage = Instance.new("Frame")
-    logsPage.Size = UDim2.new(1, 0, 1, 0)
-    logsPage.Position = UDim2.new(0, 0, 0, 0)
-    logsPage.BackgroundTransparency = 1
-    logsPage.Visible = false
-    logsPage.Parent = contentFrame
-
-    -- Adicionar o conteúdo da aba Logs
-    createLogWindow(logsPage)
-
-    -- Função pra alternar entre abas
-    local function switchTab(tab)
-        adminPage.Visible = (tab == "Admin")
-        playerPage.Visible = (tab == "Player")
-        gamePage.Visible = (tab == "Game")
-        gamepassPage.Visible = (tab == "Gamepass")
-        logsPage.Visible = (tab == "Logs")
-        adminTabButton.BackgroundTransparency = (tab == "Admin") and 0.1 or 0.3
-        playerTabButton.BackgroundTransparency = (tab == "Player") and 0.1 or 0.3
-        gameTabButton.BackgroundTransparency = (tab == "Game") and 0.1 or 0.3
-        gamepassTabButton.BackgroundTransparency = (tab == "Gamepass") and 0.1 or 0.3
-        logsTabButton.BackgroundTransparency = (tab == "Logs") and 0.1 or 0.3
-        addDebugLog("Aba " .. tab .. " selecionada", "Notificações")
-    end
-
-    adminTabButton.MouseButton1Click:Connect(function() switchTab("Admin") end)
-    playerTabButton.MouseButton1Click:Connect(function() switchTab("Player") end)
-    gameTabButton.MouseButton1Click:Connect(function() switchTab("Game") end)
-    gamepassTabButton.MouseButton1Click:Connect(function() switchTab("Gamepass") end)
-    logsTabButton.MouseButton1Click:Connect(function() switchTab("Logs") end)
+    -- Criar janela de logs forçada
+    debugLogWindow = Instance.new("Frame")
+    debugLogWindow.Size = UDim2.new(0, 300, 0, 200)
+    debugLogWindow.Position = UDim2.new(0, 10, 0, 10)
+    debugLogWindow.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    debugLogWindow.BackgroundTransparency = 0.1
+    debugLogWindow.ZIndex = 100000
+    debugLogWindow.Parent = ScreenGui
+    local uic = Instance.new("UICorner")
+    uic.CornerRadius = UDim.new(0, 10)
+    uic.Parent = debugLogWindow
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = Color3.fromRGB(0, 255, 128)
+    stroke.Thickness = 1
+    stroke.Transparency = 0.5
+    stroke.Parent = debugLogWindow
+    createLogWindow(debugLogWindow)
+    makeDraggable(debugLogWindow, debugLogWindow)
+    addDebugLog("Janela de logs forçada criada", "Notificações")
 
     showNotification("Script carregado com sucesso!")
     addDebugLog("Botão flutuante visível, inicialização concluída", "Notificações")
@@ -656,51 +666,17 @@ if not success then
     addDebugLog("Erro ao inicializar o script: " .. tostring(err), "Erros")
 end
 
--- Keybinds (movido para o final do script)
+-- Keybinds
 local keybindsEnabled = true
 local UserInputService = game:GetService("UserInputService")
 UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
     if not gameProcessedEvent and keybindsEnabled then
         if input.KeyCode == Enum.KeyCode.H then
-            print("Tecla H pressionada!")
             Main.Visible = not Main.Visible
             floatingButton.Visible = not Main.Visible
             addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via keybind H", "Notificações")
-        elseif input.KeyCode == Enum.KeyCode.F and not hasAntiCheat then
-            flyToggle.state = not flyToggle.state
-            flyToggle.onToggle(flyToggle.state)
-            addDebugLog("Fly " .. (flyToggle.state and "ativado" or "desativado") .. " via keybind F", "Notificações")
-        elseif input.KeyCode == Enum.KeyCode.N and not hasAntiCheat then
-            noclipToggle.state = not noclipToggle.state
-            noclipToggle.onToggle(noclipToggle.state)
-            addDebugLog("NoClip " .. (noclipToggle.state and "ativado" or "desativado") .. " via keybind N", "Notificações")
-        elseif input.KeyCode == Enum.KeyCode.L then
-            -- Alternar a janela de logs separada
-            if not debugLogWindow then
-                debugLogWindow = Instance.new("Frame")
-                debugLogWindow.Size = UDim2.new(0, 300, 0, 200)
-                debugLogWindow.Position = UDim2.new(0, 10, 0, 10)
-                debugLogWindow.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-                debugLogWindow.BackgroundTransparency = 0.1
-                debugLogWindow.ZIndex = 100000
-                debugLogWindow.Parent = ScreenGui
-                local uic = Instance.new("UICorner")
-                uic.CornerRadius = UDim.new(0, 10)
-                uic.Parent = debugLogWindow
-                local stroke = Instance.new("UIStroke")
-                stroke.Color = Color3.fromRGB(0, 255, 128)
-                stroke.Thickness = 1
-                stroke.Transparency = 0.5
-                stroke.Parent = debugLogWindow
-                createLogWindow(debugLogWindow)
-                makeDraggable(debugLogWindow, debugLogWindow)
-                addDebugLog("Janela de logs separada criada", "Notificações")
-            else
-                debugLogWindow.Visible = not debugLogWindow.Visible
-                addDebugLog("Janela de logs " .. (debugLogWindow.Visible and "aberta" or "fechada") .. " via keybind L", "Notificações")
-            end
         end
     end
 end)
 
-addDebugLog("Keybinds configurados (H: HUD, F: Fly, N: NoClip, L: Logs)", "Notificações")
+addDebugLog("Keybinds configurados (H: HUD)", "Notificações")
