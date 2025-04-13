@@ -6,6 +6,10 @@ if getgenv().DevHubLoaded then
 end
 getgenv().DevHubLoaded = true
 
+-- Declaração de variáveis globais
+local Main
+local floatingButton
+
 -- Sistema de logs
 local debugLog = {}
 local debugLogString = ""
@@ -126,7 +130,7 @@ local function createLogWindow()
         btn.TextSize = 12
         btn.ZIndex = 10005
         btn.Font = Enum.Font.Gotham
-        btn.Parent = filterOptions -- Corrigido: filterOffset para filterOptions
+        btn.Parent = filterOptions
         btn.MouseButton1Click:Connect(function()
             logFilter = name
             filterBtn.Text = name
@@ -162,29 +166,6 @@ local function createLogWindow()
 
     return logFrame
 end
-
--- Keybinds
-local keybindsEnabled = true
-local UserInputService = game:GetService("UserInputService")
-UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-    if not gameProcessedEvent and keybindsEnabled then
-        if input.KeyCode == Enum.KeyCode.H then
-            Main.Visible = not Main.Visible
-            floatingButton.Visible = not Main.Visible
-            addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via keybind H", "Notificações")
-        elseif input.KeyCode == Enum.KeyCode.F and not hasAntiCheat then
-            flyToggle.state = not flyToggle.state
-            flyToggle.onToggle(flyToggle.state)
-            addDebugLog("Fly " .. (flyToggle.state and "ativado" or "desativado") .. " via keybind F", "Notificações")
-        elseif input.KeyCode == Enum.KeyCode.N and not hasAntiCheat then
-            noclipToggle.state = not noclipToggle.state
-            noclipToggle.onToggle(noclipToggle.state)
-            addDebugLog("NoClip " .. (noclipToggle.state and "ativado" or "desativado") .. " via keybind N", "Notificações")
-        end
-    end
-end)
-
-addDebugLog("Keybinds configurados (H: HUD, F: Fly, N: NoClip)", "Notificações")
 
 -- Definir a função initialize
 local function initialize()
@@ -300,7 +281,7 @@ local function initialize()
     end
 
     -- Criar botão flutuante
-    local floatingButton = Instance.new("TextButton")
+    floatingButton = Instance.new("TextButton")
     floatingButton.Size = UDim2.new(0, 50, 0, 50)
     floatingButton.Position = UDim2.new(0, 20, 0.5, -25)
     floatingButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -311,14 +292,14 @@ local function initialize()
     floatingButton.Parent = ScreenGui
     createUICorner(floatingButton, 10)
     neonify(floatingButton)
-    addDebugLog("Botão flutuante criado com sucesso", "Notificações")-- Criar frame principal (HUD)
-    
+    addDebugLog("Botão flutuante criado com sucesso", "Notificações")
+
     floatingButton.MouseButton1Click:Connect(function()
         Main.Visible = not Main.Visible
         floatingButton.Visible = not Main.Visible
         addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via botão flutuante", "Notificações")
-    end)
-    local Main = Instance.new("Frame")
+    end)-- Criar frame principal (HUD)
+    Main = Instance.new("Frame")
     Main.Size = UDim2.new(0, 500, 0, 350) -- Aumentado para caber mais abas
     Main.Position = UDim2.new(0.5, -250, 0.5, -175)
     Main.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
@@ -625,3 +606,26 @@ if not success then
     warn("Erro ao inicializar o script: " .. tostring(err))
     addDebugLog("Erro ao inicializar o script: " .. tostring(err), "Erros")
 end
+
+-- Keybinds (movido para o final do script)
+local keybindsEnabled = true
+local UserInputService = game:GetService("UserInputService")
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent and keybindsEnabled then
+        if input.KeyCode == Enum.KeyCode.H then
+            Main.Visible = not Main.Visible
+            floatingButton.Visible = not Main.Visible
+            addDebugLog("HUD " .. (Main.Visible and "aberto" or "fechado") .. " via keybind H", "Notificações")
+        elseif input.KeyCode == Enum.KeyCode.F and not hasAntiCheat then
+            flyToggle.state = not flyToggle.state
+            flyToggle.onToggle(flyToggle.state)
+            addDebugLog("Fly " .. (flyToggle.state and "ativado" or "desativado") .. " via keybind F", "Notificações")
+        elseif input.KeyCode == Enum.KeyCode.N and not hasAntiCheat then
+            noclipToggle.state = not noclipToggle.state
+            noclipToggle.onToggle(noclipToggle.state)
+            addDebugLog("NoClip " .. (noclipToggle.state and "ativado" or "desativado") .. " via keybind N", "Notificações")
+        end
+    end
+end)
+
+addDebugLog("Keybinds configurados (H: HUD, F: Fly, N: NoClip)", "Notificações")
