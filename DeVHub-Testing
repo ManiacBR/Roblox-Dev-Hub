@@ -569,8 +569,7 @@ local success, err = pcall(function()
     upBtn.MouseButton1Down:Connect(function() verticalFly = 1 end)
     upBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
 
-    local downBtn = createButton("↓", flyControlFrame, UDim2.new(0, 0, 0.5, 5), UDim2.new(1, 0, 0.5, -5))downBtn.MouseButton1Down:Connect(function() verticalFly = -1 end)
-    downBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
+    local downBtn = createButton("↓", flyControlFrame, UDim2.new(0, 0, 0.5, 5), UDim2.new(1, 0, 0.5, -5))downBtn.MouseButton1Down:Connect(function() verticalFly = -1 end)downBtn.MouseButton1Up:Connect(function() verticalFly = 0 end)
 
     local function updateFly()
         local character = LocalPlayer.Character
@@ -642,68 +641,77 @@ local success, err = pcall(function()
     makeDraggable(floatingButton, floatingButton)
     makeDraggable(flyControlFrame, flyControlFrame)
 
-    -- Criar frame de abas
+    -- Criar frame para as abas (à esquerda)
     local tabButtonsFrame = Instance.new("Frame")
-    tabButtonsFrame.Size = UDim2.new(1, 0, 0, 40)
+    tabButtonsFrame.Size = UDim2.new(0, 120, 1, -50) -- 120 pixels de largura, altura ajustada para caber abaixo da dragBar
+    tabButtonsFrame.Position = UDim2.new(0, 10, 0, 50)
     tabButtonsFrame.BackgroundTransparency = 1
-    tabButtonsFrame.Position = UDim2.new(0, 0, 0, 0)
     tabButtonsFrame.Parent = Main
 
-    local adminTabButton = createButton("Admin", tabButtonsFrame, UDim2.new(0, 10, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local playerTabButton = createButton("Player", tabButtonsFrame, UDim2.new(0, 115, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local gameTabButton = createButton("Game", tabButtonsFrame, UDim2.new(0, 220, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local gamepassTabButton = createButton("Gamepass", tabButtonsFrame, UDim2.new(0, 325, 0, 5), UDim2.new(0, 100, 0, 30), true)
-    local logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 430, 0, 5), UDim2.new(0, 100, 0, 30), true)
+    -- Criar frame para o conteúdo das abas (à direita)
+    local contentFrame = Instance.new("Frame")
+    contentFrame.Size = UDim2.new(1, -140, 1, -50) -- Ocupa o espaço restante à direita
+    contentFrame.Position = UDim2.new(0, 130, 0, 50)
+    contentFrame.BackgroundTransparency = 1
+    contentFrame.Parent = Main
 
-    local resetBtn = createButton("Reset", tabButtonsFrame, UDim2.new(1, -140, 0, 5), UDim2.new(0, 60, 0, 30))
-    local closeBtn = createButton("X", tabButtonsFrame, UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30))
+    -- Criar botões de controle (Reset, Minimizar, Fechar) no topo direito
+    local resetBtn = createButton("Reset", dragBar, UDim2.new(1, -140, 0, 5), UDim2.new(0, 60, 0, 30))
+    local closeBtn = createButton("X", dragBar, UDim2.new(1, -35, 0, 5), UDim2.new(0, 30, 0, 30))
     closeBtn.TextColor3 = Color3.fromRGB(255, 100, 100)
-    local minimizeBtn = createButton("−", tabButtonsFrame, UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30))
+    local minimizeBtn = createButton("−", dragBar, UDim2.new(1, -70, 0, 5), UDim2.new(0, 30, 0, 30))
 
-    -- Linha divisória abaixo das abas
+    -- Criar botões das abas (listados verticalmente à esquerda)
+    local adminTabButton = createButton("Admin", tabButtonsFrame, UDim2.new(0, 0, 0, 0), UDim2.new(1, 0, 0, 30), true)
+    local playerTabButton = createButton("Player", tabButtonsFrame, UDim2.new(0, 0, 0, 35), UDim2.new(1, 0, 0, 30), true)
+    local gameTabButton = createButton("Game", tabButtonsFrame, UDim2.new(0, 0, 0, 70), UDim2.new(1, 0, 0, 30), true)
+    local gamepassTabButton = createButton("Gamepass", tabButtonsFrame, UDim2.new(0, 0, 0, 105), UDim2.new(1, 0, 0, 30), true)
+    local logsTabButton = createButton("Logs", tabButtonsFrame, UDim2.new(0, 0, 0, 140), UDim2.new(1, 0, 0, 30), true)
+
+    -- Linha divisória vertical entre abas e conteúdo
     local divider = Instance.new("Frame")
-    divider.Size = UDim2.new(1, -20, 0, 1)
-    divider.Position = UDim2.new(0, 10, 0, 40)
+    divider.Size = UDim2.new(0, 1, 1, -60)
+    divider.Position = UDim2.new(0, 125, 0, 50)
     divider.BackgroundColor3 = Color3.fromRGB(0, 255, 128)
     divider.BackgroundTransparency = 0.5
     divider.BorderSizePixel = 0
     divider.Parent = Main
 
-    -- Criar páginas das abas
+    -- Criar páginas das abas (agora dentro do contentFrame)
     local adminPage = Instance.new("Frame")
-    adminPage.Size = UDim2.new(1, 0, 1, -50)
-    adminPage.Position = UDim2.new(0, 0, 0, 50)
+    adminPage.Size = UDim2.new(1, 0, 1, 0)
+    adminPage.Position = UDim2.new(0, 0, 0, 0)
     adminPage.BackgroundTransparency = 1
     adminPage.Visible = true
-    adminPage.Parent = Main
+    adminPage.Parent = contentFrame
 
     local playerPage = Instance.new("Frame")
-    playerPage.Size = UDim2.new(1, 0, 1, -50)
-    playerPage.Position = UDim2.new(0, 0, 0, 50)
+    playerPage.Size = UDim2.new(1, 0, 1, 0)
+    playerPage.Position = UDim2.new(0, 0, 0, 0)
     playerPage.BackgroundTransparency = 1
     playerPage.Visible = false
-    playerPage.Parent = Main
+    playerPage.Parent = contentFrame
 
     local gamePage = Instance.new("Frame")
-    gamePage.Size = UDim2.new(1, 0, 1, -50)
-    gamePage.Position = UDim2.new(0, 0, 0, 50)
+    gamePage.Size = UDim2.new(1, 0, 1, 0)
+    gamePage.Position = UDim2.new(0, 0, 0, 0)
     gamePage.BackgroundTransparency = 1
     gamePage.Visible = false
-    gamePage.Parent = Main
+    gamePage.Parent = contentFrame
 
     local gamepassPage = Instance.new("Frame")
-    gamepassPage.Size = UDim2.new(1, 0, 1, -50)
-    gamepassPage.Position = UDim2.new(0, 0, 0, 50)
+    gamepassPage.Size = UDim2.new(1, 0, 1, 0)
+    gamepassPage.Position = UDim2.new(0, 0, 0, 0)
     gamepassPage.BackgroundTransparency = 1
     gamepassPage.Visible = false
-    gamepassPage.Parent = Main
+    gamepassPage.Parent = contentFrame
 
     local logsPage = Instance.new("Frame")
-    logsPage.Size = UDim2.new(1, 0, 1, -50)
-    logsPage.Position = UDim2.new(0, 0, 0, 50)
+    logsPage.Size = UDim2.new(1, 0, 1, 0)
+    logsPage.Position = UDim2.new(0, 0, 0, 0)
     logsPage.BackgroundTransparency = 1
     logsPage.Visible = false
-    logsPage.Parent = Main
+    logsPage.Parent = contentFrame
 
     -- Função pra alternar entre abas
     local function switchTab(tab)
@@ -1150,133 +1158,242 @@ local success, err = pcall(function()
     end
 
     -- Conteúdo da aba Gamepass
-    local gamepassFrame = Instance.new("ScrollingFrame")
-    gamepassFrame.Size = UDim2.new(1, -20, 1, -20)
-    gamepassFrame.Position = UDim2.new(0, 10, 0, 10)
-    gamepassFrame.BackgroundTransparency = 1
-    gamepassFrame.ScrollBarThickness = 4
-    gamepassFrame.Parent = gamepassPage
+    local selectedGamepass = nil -- Para armazenar o gamepass selecionado
+    local gamepassListFrame = nil -- Para a lista de gamepasses
+    local autoBuyConnection = nil -- Para o loop de auto-compra
+    local gamepasses = {} -- Lista de gamepasses detectados
 
-    local uiListLayout = Instance.new("UIListLayout")
-    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-    uiListLayout.Parent = gamepassFrame
-
+    -- Função para carregar gamepasses
     local function loadGamepasses()
-        -- Tentar obter informações do jogo
-        local gameInfo = MarketplaceService:GetProductInfo(currentPlaceId)
+        gamepasses = {} -- Limpar a lista de gamepasses
+        local success, gameInfo = pcall(function()
+            return MarketplaceService:GetProductInfo(currentPlaceId)
+        end)
+        if not success then
+            addDebugLog("Erro ao obter informações do jogo: " .. tostring(gameInfo), "Erros")
+            showNotification("Erro ao carregar gamepasses!")
+            return
+        end
         addDebugLog("Carregando gamepasses para o jogo: " .. gameInfo.Name, "Notificações")
 
-        local gamepasses = {}
-        -- Essa é uma abordagem simplificada; na prática, você precisaria conhecer os IDs dos gamepasses
-        -- Vamos simular alguns gamepasses fictícios para demonstração
-        local success, products = pcall(function()
-            return MarketplaceService:GetDeveloperProductsAsync()
+        -- Tentar obter os gamepasses do jogo
+        local successProducts, products = pcall(function()
+            return game:GetService("MarketplaceService"):GetDeveloperProductsAsync()
         end)
-        if success then
+        if successProducts then
             for _, product in pairs(products:GetCurrentPage()) do
-                table.insert(gamepasses, {Name = product.Name, ProductId = product.ProductId})
+                -- Filtrar apenas gamepasses (ignorar outros produtos)
+                local productInfo = MarketplaceService:GetProductInfo(product.ProductId)
+                if productInfo.ProductType == "Game Pass" then
+                    table.insert(gamepasses, {Name = productInfo.Name, ProductId = productInfo.ProductId})
+                end
             end
         else
             addDebugLog("Erro ao carregar gamepasses: " .. tostring(products), "Erros")
         end
 
-        -- Adicionar botões para cada gamepass
+        -- Atualizar a lista de gamepasses na UI
+        if gamepassListFrame then
+            gamepassListFrame:Destroy()
+        end
+        gamepassListFrame = Instance.new("Frame")
+        gamepassListFrame.Size = UDim2.new(1, -20, 0, 150)
+        gamepassListFrame.Position = UDim2.new(0, 10, 0, 10)
+        gamepassListFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        gamepassListFrame.BackgroundTransparency = 0.1
+        gamepassListFrame.ZIndex = 10005
+        gamepassListFrame.Parent = gamepassPage
+        createUICorner(gamepassListFrame, 8)
+        neonify(gamepassListFrame)
+
+        local scrollingFrame = Instance.new("ScrollingFrame")
+        scrollingFrame.Size = UDim2.new(1, -10, 1, -10)
+        scrollingFrame.Position = UDim2.new(0, 5, 0, 5)
+        scrollingFrame.BackgroundTransparency = 1
+        scrollingFrame.ScrollBarThickness = 4
+        scrollingFrame.ZIndex = 10006
+        scrollingFrame.Parent = gamepassListFrame
+
+        local uiListLayout = Instance.new("UIListLayout")
+        uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        uiListLayout.Parent = scrollingFrame
+
         for i, gamepass in ipairs(gamepasses) do
-            local btn = createButton("Ativar " .. gamepass.Name, gamepassFrame, UDim2.new(0, 0, 0, (i - 1) * 35), UDim2.new(1, 0, 0, 30))
-            btn.MouseButton1Click:Connect(function()
-                -- Simular a posse do gamepass (isso depende do jogo)
-                local ownsGamepass = false
-                pcall(function()
-                    ownsGamepass = MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, gamepass.ProductId)
-                end)
-                if not ownsGamepass then
-                    -- Tentar forçar a ativação (depende do jogo)
-                    MarketplaceService:PromptGamePassPurchaseFinished(LocalPlayer, gamepass.ProductId, true)
-                    showNotification("Tentativa de ativar " .. gamepass.Name)
-                    addDebugLog("Tentativa de ativar gamepass: " .. gamepass.Name, "Notificações")
-                else
-                    showNotification("Você já possui este gamepass!")
-                    addDebugLog("Gamepass já possuído: " .. gamepass.Name, "Notificações")
-                end
+            local gamepassBtn = Instance.new("TextButton")
+            gamepassBtn.Size = UDim2.new(1, 0, 0, 20)
+            gamepassBtn.Position = UDim2.new(0, 0, 0, (i - 1) * 22)
+            gamepassBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            gamepassBtn.Text = gamepass.Name
+            gamepassBtn.BackgroundTransparency = 0.1
+            gamepassBtn.TextSize = 12
+            gamepassBtn.ZIndex = 10007
+            gamepassBtn.Font = Enum.Font.Gotham
+            gamepassBtn.Parent = scrollingFrame
+            gamepassBtn.MouseButton1Click:Connect(function()
+                selectedGamepass = gamepass
+                selectGamepassBtn.Text = "Gamepass: " .. gamepass.Name
+                gamepassListFrame.Visible = false
             end)
         end
 
-        gamepassFrame.CanvasSize = UDim2.new(0, 0, 0, #gamepasses * 35)
+        scrollingFrame.CanvasSize = UDim2.new(0, 0, 0, #gamepasses * 22)
     end
 
+    -- Botão para selecionar gamepass
+    local selectGamepassBtn = createButton("Selecionar Gamepass", gamepassPage, UDim2.new(0, 10, 0, 170))
+    selectGamepassBtn.MouseButton1Click:Connect(function()
+        if not gamepassListFrame then
+            loadGamepasses()
+        end
+        gamepassListFrame.Visible = not gamepassListFrame.Visible
+    end)
+
+    -- Botão para comprar o gamepass selecionado
+    local buyGamepassBtn = createButton("Comprar Gamepass", gamepassPage, UDim2.new(0, 10, 0, 200))
+    buyGamepassBtn.MouseButton1Click:Connect(function()
+        if selectedGamepass then
+            local ownsGamepass = false
+            local success, err = pcall(function()
+                ownsGamepass = MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, selectedGamepass.ProductId)
+            end)
+            if success and not ownsGamepass then
+                MarketplaceService:PromptGamePassPurchase(LocalPlayer, selectedGamepass.ProductId)
+                showNotification("Solicitando compra de " .. selectedGamepass.Name)
+                addDebugLog("Solicitando compra de gamepass: " .. selectedGamepass.Name, "Notificações")
+            elseif ownsGamepass then
+                showNotification("Você já possui este gamepass!")
+                addDebugLog("Gamepass já possuído: " .. selectedGamepass.Name, "Notificações")
+            else
+                showNotification("Erro ao verificar posse do gamepass")
+                addDebugLog("Erro ao verificar posse do gamepass: " .. tostring(err), "Erros")
+            end
+        else
+            showNotification("Selecione um gamepass primeiro!")
+            addDebugLog("Tentativa de compra sem gamepass selecionado", "Erros")
+        end
+    end)
+
+    -- Botão para comprar todos os gamepasses
+    local buyAllGamepassesBtn = createButton("Comprar Todos os Gamepasses", gamepassPage, UDim2.new(0, 10, 0, 230))
+    buyAllGamepassesBtn.MouseButton1Click:Connect(function()
+        if #gamepasses == 0 then
+            showNotification("Nenhum gamepass detectado!")
+            addDebugLog("Tentativa de comprar todos os gamepasses, mas nenhum foi detectado", "Erros")
+            return
+        end
+        for _, gamepass in ipairs(gamepasses) do
+            local ownsGamepass = false
+            local success, err = pcall(function()
+                ownsGamepass = MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, gamepass.ProductId)
+            end)
+            if success and not ownsGamepass then
+                MarketplaceService:PromptGamePassPurchase(LocalPlayer, gamepass.ProductId)
+                task.wait(0.5) -- Pequeno delay para evitar sobrecarga
+                addDebugLog("Solicitando compra de gamepass: " .. gamepass.Name, "Notificações")
+            elseif ownsGamepass then
+                addDebugLog("Gamepass já possuído: " .. gamepass.Name, "Notificações")
+            else
+                addDebugLog("Erro ao verificar posse do gamepass: " .. tostring(err), "Erros")
+            end
+        end
+        showNotification("Solicitando compra de todos os gamepasses!")
+        addDebugLog("Solicitando compra de todos os gamepasses", "Notificações")
+    end)
+
+    -- Toggle para auto-comprar o gamepass selecionado
+    local autoBuyToggle = { state = false }
+    local autoBuyFrame = createToggle("Auto Comprar Selecionado", gamepassPage, UDim2.new(0, 10, 0, 260), autoBuyToggle)
+    autoBuyToggle.onToggle = function(state)
+        autoBuyToggle.state = state
+        if state then
+            if not selectedGamepass then
+                showNotification("Selecione um gamepass primeiro!")
+                addDebugLog("Tentativa de auto-compra sem gamepass selecionado", "Erros")
+                autoBuyToggle.state = false
+                autoBuyFrame:Destroy()
+                autoBuyFrame = createToggle("Auto Comprar Selecionado", gamepassPage, UDim2.new(0, 10, 0, 260), autoBuyToggle)
+                return
+            end
+            autoBuyConnection = RunService.Heartbeat:Connect(function()
+                if not autoBuyToggle.state then
+                    autoBuyConnection:Disconnect()
+                    return
+                end
+                local ownsGamepass = false
+                local success, err = pcall(function()
+                    ownsGamepass = MarketplaceService:UserOwnsGamePassAsync(LocalPlayer.UserId, selectedGamepass.ProductId)
+                end)
+                if success and not ownsGamepass then
+                    MarketplaceService:PromptGamePassPurchase(LocalPlayer, selectedGamepass.ProductId)
+                    addDebugLog("Auto-compra de gamepass: " .. selectedGamepass.Name, "Notificações")
+                elseif ownsGamepass then
+                    showNotification("Você já possui este gamepass! Auto-compra desativada.")
+                    addDebugLog("Gamepass já possuído, auto-compra desativada: " .. selectedGamepass.Name, "Notificações")
+                    autoBuyToggle.state = false
+                    autoBuyFrame:Destroy()
+                    autoBuyFrame = createToggle("Auto Comprar Selecionado", gamepassPage, UDim2.new(0, 10, 0, 260), autoBuyToggle)
+                else
+                    addDebugLog("Erro na auto-compra: " .. tostring(err), "Erros")
+                end
+                task.wait(1) -- Delay para evitar sobrecarga
+            end)
+            showNotification("Auto-compra ativada para " .. selectedGamepass.Name)
+            addDebugLog("Auto-compra ativada para " .. selectedGamepass.Name, "Notificações")
+        else
+            if autoBuyConnection then
+                autoBuyConnection:Disconnect()
+                autoBuyConnection = nil
+            end
+            showNotification("Auto-compra desativada!")
+            addDebugLog("Auto-compra desativada", "Notificações")
+        end
+    end
+
+    -- Carregar gamepasses ao abrir a aba
     loadGamepasses()
 
-    -- Conteúdo da aba Logs
-    local logBtn = createButton("Ver Logs", logsPage, UDim2.new(0, 10, 0, 10))
-    logBtn.MouseButton1Click:Connect(function()
-        createLogWindow()
-        showNotification("Logs abertos!")
-    end)
-    logBtn.Parent = logsPage
-
-    -- Conectar botão flutuante
-    floatingButton.MouseButton1Click:Connect(function()
-        Main.Visible = true
-        floatingButton.Visible = false
-        showNotification("HUD aberto!")
-    end)
-
-    -- Conectar botões de fechar e minimizar
+    -- Configurar botão de fechar
     closeBtn.MouseButton1Click:Connect(function()
         ScreenGui:Destroy()
-        if flyConnection then flyConnection:Disconnect() end
-        if bodyVelocity then bodyVelocity:Destroy() end
-        showNotification("Script fechado!")
-        addDebugLog("Script destruído", "Notificações")
-        getgenv().DevHubLoaded = nil
+        showNotification("Script encerrado!")
+        addDebugLog("Script encerrado", "Notificações")
     end)
 
+    -- Configurar botão de minimizar
     minimizeBtn.MouseButton1Click:Connect(function()
         Main.Visible = false
         floatingButton.Visible = true
-        showNotification("HUD minimizado!")
     end)
 
-    -- Keybinds para PC
-    UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
-        if gameProcessedEvent then return end
+    -- Configurar botão flutuante
+    floatingButton.MouseButton1Click:Connect(function()
+        Main.Visible = true
+        floatingButton.Visible = false
+    end)
+
+    -- Keybinds
+    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+        if gameProcessed then return end
         if input.KeyCode == Enum.KeyCode.H then
             if Main.Visible then
                 Main.Visible = false
                 floatingButton.Visible = true
-                showNotification("HUD minimizado!")
             else
                 Main.Visible = true
                 floatingButton.Visible = false
-                showNotification("HUD aberto!")
             end
-        elseif input.KeyCode == Enum.KeyCode.F then
+        elseif input.KeyCode == Enum.KeyCode.F and not hasAntiCheat then
             flyToggle.state = not flyToggle.state
             flyToggle.onToggle(flyToggle.state)
-        elseif input.KeyCode == Enum.KeyCode.N then
+        elseif input.KeyCode == Enum.KeyCode.N and not hasAntiCheat then
             noclipToggle.state = not noclipToggle.state
             noclipToggle.onToggle(noclipToggle.state)
         end
     end)
 
-    -- Tornar o botão flutuante visível inicialmente
-    floatingButton.Visible = true
+    showNotification("Script carregado com sucesso!")
     addDebugLog("Botão flutuante visível, inicialização concluída", "Notificações")
-
-    -- Aplicar configurações salvas
-    flyToggle.state = settings.flying
-    flyToggle.onToggle(settings.flying)
-    noclipToggle.state = settings.noclip
-    noclipToggle.onToggle(settings.noclip)
-    espToggle.state = settings.espEnabled
-    espToggle.onToggle(settings.espEnabled)
-    mapNoClipToggle.state = settings.mapNoClip
-    mapNoClipToggle.onToggle(settings.mapNoClip)
-    dayNightToggle.state = settings.dayNight
-    dayNightToggle.onToggle(settings.dayNight)
-end)
-
-if not success then
-    warn("Erro ao carregar script: " .. tostring(err))
-    addDebugLog("Erro ao carregar script: " .. tostring(err), "Erros")
 end
+
+-- Executar a inicialização
+initialize()
